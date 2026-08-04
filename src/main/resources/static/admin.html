@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f9; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #343a40; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Admin Dashboard</h2>
+    <button onclick="logout()" style="background: #dc3545; color:white; border:none; padding:10px; cursor:pointer;">Logout</button>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Citizen</th>
+            <th>Issue</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const user = localStorage.getItem("currentUser");
+    if (user.toLowerCase() !== "admin") window.location.href = "/";
+
+    function loadGrievances() {
+        fetch('/api/grievances')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById("tableBody");
+                tbody.innerHTML = "";
+
+                data.forEach(g => {
+                    tbody.innerHTML += `
+                            <tr>
+                                <td>${g.citizenName}</td>
+                                <td><b>${g.title}</b></td>
+                                <td>${g.description}</td>
+                                <td>${g.status}</td>
+                                <td>
+                                    <select onchange="updateStatus(${g.id}, this.value)">
+                                        <option value="">Update...</option>
+                                        <option value="OPEN">Open</option>
+                                        <option value="SOLVING">Solving</option>
+                                        <option value="SOLVED">Solved</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `;
+                });
+            });
+    }
+
+    function updateStatus(id, newStatus) {
+        if(!newStatus) return;
+        fetch(`/api/grievances/${id}/status?status=${newStatus}`, { method: 'PUT' })
+            .then(() => loadGrievances());
+    }
+
+    function logout() {
+        localStorage.removeItem("currentUser");
+        window.location.href = "/";
+    }
+
+    loadGrievances();
+</script>
+</body>
+</html>
