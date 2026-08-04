@@ -32,4 +32,9 @@ public class GrievanceController {
     public Grievance updateStatus(@PathVariable Long id, @RequestParam String status) {
         return service.updateStatus(id, status);
     }
+    // New web link to delete a record
+    @DeleteMapping("/{id}")
+    public void deleteGrievance(@PathVariable Long id) {
+        service.deleteGrievance(id);
+    }
 }

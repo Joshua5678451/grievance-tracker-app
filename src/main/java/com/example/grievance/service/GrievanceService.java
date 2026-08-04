@@ -30,4 +30,8 @@ public class GrievanceService {
         grievance.setStatus(newStatus);
         return repository.save(grievance);
     }
+    // New trick: Delete a grievance
+    public void deleteGrievance(Long id) {
+        repository.deleteById(id);
+    }
 }

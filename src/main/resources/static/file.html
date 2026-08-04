@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File a Grievance</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
+        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/home.html" class="back-link">← Back to Home</a>
+    <h2>Report an Issue</h2>
+    <input type="text" id="title" placeholder="Short Title (e.g., Broken Pipe)">
+    <textarea id="description" placeholder="Provide details here..." rows="5"></textarea>
+    <button onclick="submitGrievance()">Submit to Authorities</button>
+</div>
+<script>
+    const user = localStorage.getItem("currentUser");
+    if (!user) window.location.href = "/";
+
+    function submitGrievance() {
+        const t = document.getElementById("title").value;
+        const d = document.getElementById("description").value;
+        if(!t || !d) return alert("Please fill everything!");
+
+        fetch('/api/grievances', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ citizenName: user, title: t, description: d })
+        }).then(() => {
+            alert("Grievance Successfully Filed!");
+            window.location.href = "/track.html"; // Send them to see it!
+        });
+    }
+</script>
+</body>
+</html>
