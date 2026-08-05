@@ -5,71 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grievance Portal</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
         .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px;}
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px;}
         button:hover { background: #004494; }
-        .toggle-text { margin-top: 15px; font-size: 14px; color: #555; cursor: pointer; text-decoration: underline; }
+        .toggle-text { margin-top: 15px; font-size: 13px; color: #555; cursor: pointer; text-decoration: underline; }
+        .captcha-box { background: #f8f9fa; padding: 10px; border-radius: 6px; margin: 10px 0; border: 1px dashed #ccc; font-weight: bold; color: #d9534f; }
     </style>
 </head>
 <body>
-<div class="card" id="loginBox">
-    <h2>Welcome Back</h2>
-    <input type="text" id="loginUser" placeholder="Username">
-    <input type="password" id="loginPass" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div class="toggle-text" onclick="toggleView()">Need an account? Sign Up</div>
-</div>
 
-<div class="card" id="signupBox" style="display: none;">
+<!-- 1. LOGIN SCREEN -->
+<form class="card" id="loginBox" onsubmit="event.preventDefault(); login();">
+    <h2>Grievance Portal</h2>
+    <input type="text" id="loginUser" placeholder="Username" required>
+    <input type="password" id="loginPass" placeholder="Password" required>
+
+    <div class="captcha-box">
+        <span>Solve: </span><span id="loginCaptchaText"></span>
+        <input type="number" id="loginCaptchaInput" placeholder="Enter answer" required>
+    </div>
+
+    <button type="submit">Login</button>
+    <div class="toggle-text" onclick="showScreen('signupBox')">Need an account? Sign Up</div>
+    <div class="toggle-text" onclick="showScreen('forgotBox')">Forgot Password?</div>
+</form>
+
+<!-- 2. SIGNUP SCREEN -->
+<form class="card" id="signupBox" style="display: none;" onsubmit="event.preventDefault(); signup();">
     <h2>Create Account</h2>
-    <input type="text" id="signUser" placeholder="Choose a Username">
-    <input type="password" id="signPass" placeholder="Choose a Password">
-    <button onclick="signup()" style="background: #28a745;">Sign Up</button>
-    <div class="toggle-text" onclick="toggleView()">Already have an account? Login</div>
-</div>
+    <input type="text" id="signUser" placeholder="Choose a Username" required>
+    <input type="password" id="signPass" placeholder="Choose a Password" required>
+
+    <select id="signQuestion">
+        <option value="Childhood best friend's name?">Childhood best friend's name?</option>
+        <option value="What city were you born in?">What city were you born in?</option>
+        <option value="What is your favorite color?">What is your favorite color?</option>
+    </select>
+    <input type="text" id="signAnswer" placeholder="Your Security Answer" required>
+
+    <button type="submit" style="background: #28a745;">Sign Up</button>
+    <div class="toggle-text" onclick="showScreen('loginBox')">Already have an account? Login</div>
+</form>
+
+<!-- 3. FORGOT PASSWORD SCREEN -->
+<form class="card" id="forgotBox" style="display: none;" onsubmit="event.preventDefault(); resetPassword();">
+    <h2>Reset Password</h2>
+    <p style="font-size: 13px; color: gray;">Enter your username to reset.</p>
+    <input type="text" id="resetUser" placeholder="Username" required>
+    <input type="text" id="resetAnswer" placeholder="Your Security Answer" required>
+    <input type="password" id="resetNewPass" placeholder="New Password" required>
+
+    <button type="submit" style="background: #dc3545;">Reset Password</button>
+    <div class="toggle-text" onclick="showScreen('loginBox')">Back to Login</div>
+</form>
 
 <script>
-    function toggleView() {
-        const loginBox = document.getElementById('loginBox');
-        const signupBox = document.getElementById('signupBox');
-        if (loginBox.style.display === 'none') {
-            loginBox.style.display = 'block';
-            signupBox.style.display = 'none';
-        } else {
-            loginBox.style.display = 'none';
-            signupBox.style.display = 'block';
-        }
+    // --- CAPTCHA LOGIC ---
+    let captchaAnswer = 0;
+
+    function generateCaptcha() {
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        captchaAnswer = num1 + num2;
+        document.getElementById("loginCaptchaText").innerText = num1 + " + " + num2 + " = ?";
+        document.getElementById("loginCaptchaInput").value = "";
     }
 
+    // --- NAVIGATION LOGIC ---
+    function showScreen(screenId) {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('signupBox').style.display = 'none';
+        document.getElementById('forgotBox').style.display = 'none';
+        document.getElementById(screenId).style.display = 'block';
+
+        if (screenId === 'loginBox') generateCaptcha();
+    }
+
+    // --- API CALLS ---
     function signup() {
-        const u = document.getElementById('signUser').value;
+        const u = document.getElementById('signUser').value.trim();
         const p = document.getElementById('signPass').value;
+        const q = document.getElementById('signQuestion').value;
+        const a = document.getElementById('signAnswer').value.trim();
+
+        if(!u || !p || !a) return alert("Please fill all fields!");
+
+        // 🛡️ PASSWORD SECURITY CHECK
+        const hasCapital = /[A-Z]/.test(p);
+        const hasNumber = /[0-9]/.test(p);
+        const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(p);
+
+        if (!hasCapital || !hasNumber || !hasSymbol) {
+            return alert("Weak Password! It must contain at least:\n- One Capital Letter\n- One Number\n- One Symbol (e.g. @, #, $)");
+        }
+
         fetch('/api/users/signup', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: u, password: p })
-        }).then(res => res.text()).then(msg => {
-            alert(msg);
-            if(msg.includes("successful")) toggleView();
-        });
+            body: JSON.stringify({ username: u, password: p, securityQuestion: q, securityAnswer: a })
+        }).then(async res => {
+            const msg = await res.text();
+            if(!res.ok) throw new Error(msg);
+            return msg;
+        }).then(msg => {
+            alert("Account created successfully! Please log in.");
+            document.getElementById('signUser').value = "";
+            document.getElementById('signPass').value = "";
+            document.getElementById('signAnswer').value = "";
+            showScreen('loginBox');
+        }).catch(err => alert(err.message));
     }
 
     function login() {
-        const u = document.getElementById('loginUser').value;
+        const userInput = parseInt(document.getElementById('loginCaptchaInput').value);
+        if (userInput !== captchaAnswer) {
+            alert("Incorrect Captcha Answer! Are you a robot?");
+            generateCaptcha();
+            return;
+        }
+
+        const u = document.getElementById('loginUser').value.trim();
         const p = document.getElementById('loginPass').value;
+
         fetch('/api/users/login', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: u, password: p })
-        }).then(res => {
-            if(!res.ok) throw new Error("Invalid credentials");
+        }).then(async res => {
+            if(!res.ok) {
+                const errorMsg = await res.text();
+                throw new Error(errorMsg);
+            }
             return res.json();
         }).then(data => {
             localStorage.setItem("currentUser", data.username);
             localStorage.setItem("role", data.role);
             window.location.href = data.role === "ADMIN" ? "/admin.html" : "/home.html";
+        }).catch(err => {
+            alert(err.message);
+            generateCaptcha();
+        });
+    }
+
+    function resetPassword() {
+        const u = document.getElementById('resetUser').value.trim();
+        const a = document.getElementById('resetAnswer').value.trim();
+        const np = document.getElementById('resetNewPass').value;
+
+        if(!u || !a || !np) return alert("Please fill all fields!");
+
+        // 🛡️ PASSWORD SECURITY CHECK FOR RESET
+        const hasCapital = /[A-Z]/.test(np);
+        const hasNumber = /[0-9]/.test(np);
+        const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(np);
+
+        if (!hasCapital || !hasNumber || !hasSymbol) {
+            return alert("Weak Password! It must contain at least:\n- One Capital Letter\n- One Number\n- One Symbol (e.g. @, #, $)");
+        }
+
+        fetch('/api/users/reset-password', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, securityAnswer: a, password: np })
+        }).then(async res => {
+            const msg = await res.text();
+            if(!res.ok) throw new Error(msg);
+            return msg;
+        }).then(msg => {
+            alert("Success! You can now log in with your new password.");
+            document.getElementById('resetUser').value = "";
+            document.getElementById('resetAnswer').value = "";
+            document.getElementById('resetNewPass').value = "";
+            showScreen('loginBox');
         }).catch(err => alert(err.message));
     }
+
+    generateCaptcha();
 </script>
 </body>
 </html>

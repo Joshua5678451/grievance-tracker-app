@@ -11,14 +11,20 @@ public class User {
 
     private String username;
     private String password;
-    private String role; // "CITIZEN" or "ADMIN"
+    private String role;
+
+    // New fields for Forgot Password
+    private String securityQuestion;
+    private String securityAnswer;
 
     public User() {}
 
-    public User(String username, String password, String role) {
+    public User(String username, String password, String role, String securityQuestion, String securityAnswer) {
         this.username = username;
         this.password = password;
         this.role = role;
+        this.securityQuestion = securityQuestion;
+        this.securityAnswer = securityAnswer;
     }
 
     public Long getId() { return id; }
@@ -28,4 +34,8 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getSecurityQuestion() { return securityQuestion; }
+    public void setSecurityQuestion(String securityQuestion) { this.securityQuestion = securityQuestion; }
+    public String getSecurityAnswer() { return securityAnswer; }
+    public void setSecurityAnswer(String securityAnswer) { this.securityAnswer = securityAnswer; }
 }
