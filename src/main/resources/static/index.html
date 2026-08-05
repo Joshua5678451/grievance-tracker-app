@@ -11,20 +11,31 @@
         button { width: 100%; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px;}
         button:hover { background: #004494; }
         .toggle-text { margin-top: 15px; font-size: 13px; color: #555; cursor: pointer; text-decoration: underline; }
-        .captcha-box { background: #f8f9fa; padding: 10px; border-radius: 6px; margin: 10px 0; border: 1px dashed #ccc; font-weight: bold; color: #d9534f; }
+
+        /* New Canvas Captcha Styles */
+        .captcha-box { background: #f8f9fa; padding: 10px; border-radius: 6px; margin: 10px 0; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; }
+        .captcha-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; width: 100%; }
+        canvas { border: 1px solid #aaa; border-radius: 4px; background: white; }
+        .refresh-btn { width: auto; padding: 8px 12px; margin: 0; background: #6c757d; font-size: 16px; }
+        .refresh-btn:hover { background: #5a6268; }
     </style>
 </head>
 <body>
 
 <!-- 1. LOGIN SCREEN -->
 <form class="card" id="loginBox" onsubmit="event.preventDefault(); login();">
-    <h2>Grievance Portal</h2>
+    <h2>Welcome Back</h2>
     <input type="text" id="loginUser" placeholder="Username" required>
     <input type="password" id="loginPass" placeholder="Password" required>
 
+    <!-- Upgraded Distorted Captcha Box -->
     <div class="captcha-box">
-        <span>Solve: </span><span id="loginCaptchaText"></span>
-        <input type="number" id="loginCaptchaInput" placeholder="Enter answer" required>
+        <div class="captcha-row">
+            <canvas id="captchaCanvas" width="140" height="40"></canvas>
+            <!-- type="button" stops the Enter key from clicking this button -->
+            <button type="button" class="refresh-btn" onclick="generateCaptcha()" title="Refresh Captcha">↻</button>
+        </div>
+        <input type="text" id="loginCaptchaInput" placeholder="Enter the letters above" required autocomplete="off">
     </div>
 
     <button type="submit">Login</button>
@@ -62,15 +73,56 @@
 </form>
 
 <script>
-    // --- CAPTCHA LOGIC ---
-    let captchaAnswer = 0;
+    // --- NEW IMAGE CAPTCHA LOGIC ---
+    let captchaAnswer = "";
 
     function generateCaptcha() {
-        const num1 = Math.floor(Math.random() * 10) + 1;
-        const num2 = Math.floor(Math.random() * 10) + 1;
-        captchaAnswer = num1 + num2;
-        document.getElementById("loginCaptchaText").innerText = num1 + " + " + num2 + " = ?";
-        document.getElementById("loginCaptchaInput").value = "";
+        const canvas = document.getElementById('captchaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Clear old canvas and fill with light gray background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#f3f3f3";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Allowed characters (Removed O, 0, 1, I, l for easier reading)
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+        captchaAnswer = "";
+        for (let i = 0; i < 6; i++) {
+            captchaAnswer += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        // 1. Draw random messy background lines (Noise)
+        for (let i = 0; i < 6; i++) {
+            ctx.strokeStyle = getRandomColor();
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.stroke();
+        }
+
+        // 2. Draw the distorted letters
+        for (let i = 0; i < captchaAnswer.length; i++) {
+            ctx.font = "bold " + (18 + Math.random() * 8) + "px Arial"; // Random font size
+            ctx.fillStyle = getRandomColor(); // Random text color
+
+            ctx.save();
+            ctx.translate(15 + (i * 20), 25 + (Math.random() * 5)); // Random X and Y spacing
+            ctx.rotate((Math.random() - 0.5) * 0.5); // Random tilt angle
+            ctx.fillText(captchaAnswer[i], 0, 0);
+            ctx.restore();
+        }
+
+        // Clear the user's input box
+        document.getElementById('loginCaptchaInput').value = "";
+    }
+
+    function getRandomColor() {
+        // Generates random dark colors so they stand out against the light background
+        const r = Math.floor(Math.random() * 150);
+        const g = Math.floor(Math.random() * 150);
+        const b = Math.floor(Math.random() * 150);
+        return `rgb(${r},${g},${b})`;
     }
 
     // --- NAVIGATION LOGIC ---
@@ -92,7 +144,6 @@
 
         if(!u || !p || !a) return alert("Please fill all fields!");
 
-        // 🛡️ PASSWORD SECURITY CHECK
         const hasCapital = /[A-Z]/.test(p);
         const hasNumber = /[0-9]/.test(p);
         const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(p);
@@ -118,9 +169,10 @@
     }
 
     function login() {
-        const userInput = parseInt(document.getElementById('loginCaptchaInput').value);
-        if (userInput !== captchaAnswer) {
-            alert("Incorrect Captcha Answer! Are you a robot?");
+        // Verify new Image Captcha (case-insensitive for better user experience)
+        const userInput = document.getElementById('loginCaptchaInput').value.trim().toLowerCase();
+        if (userInput !== captchaAnswer.toLowerCase()) {
+            alert("Incorrect Captcha! Please try the new image.");
             generateCaptcha();
             return;
         }
@@ -154,7 +206,6 @@
 
         if(!u || !a || !np) return alert("Please fill all fields!");
 
-        // 🛡️ PASSWORD SECURITY CHECK FOR RESET
         const hasCapital = /[A-Z]/.test(np);
         const hasNumber = /[0-9]/.test(np);
         const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(np);
@@ -179,6 +230,7 @@
         }).catch(err => alert(err.message));
     }
 
+    // Generate the first distorted image on page load
     generateCaptcha();
 </script>
 </body>
