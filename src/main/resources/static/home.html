@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citizen Hub - Grievance Portal</title>
+    <title>Grievance Tracker - Home</title>
     <style>
         /* Reset & Base */
         body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100%; }
         a { text-decoration: none; }
 
-        /* 1. Sleek Dark Navbar (Neon Style) */
+        /* Sleek Dark Navbar */
         .navbar {
             background-color: #0d1117;
             padding: 0 40px;
@@ -27,22 +27,21 @@
         .nav-link { color: #c9d1d9; font-size: 15px; font-weight: 500; transition: color 0.2s; position: relative; padding: 25px 0;}
         .nav-link:hover { color: #ffffff; }
 
-        /* 2. Hover Dropdown Magic */
+        /* Hover Dropdown */
         .dropdown { position: relative; }
         .dropdown-menu {
             position: absolute;
-            top: 70px; /* Right below the navbar */
+            top: 70px;
             left: 0;
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 8px;
             width: 220px;
-            display: none; /* Hidden by default */
+            display: none;
             flex-direction: column;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             overflow: hidden;
         }
-        /* When hovering over the .dropdown container, display the menu! */
         .dropdown:hover .dropdown-menu { display: flex; }
 
         .dropdown-item { padding: 14px 20px; color: #c9d1d9; font-size: 14px; border-bottom: 1px solid #30363d; transition: background 0.2s;}
@@ -54,10 +53,9 @@
         .btn-logout { background: transparent; color: #f85149; border: 1px solid #f85149; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s;}
         .btn-logout:hover { background: #f85149; color: #fff; }
 
-        /* 3. Hero Image Section */
+        /* Hero Image Section */
         .hero {
             height: 100vh;
-            /* High-quality city image from Unsplash with a dark overlay */
             background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
             display: flex;
             flex-direction: column;
@@ -69,7 +67,7 @@
         .hero h1 { color: #ffffff; font-size: 3.5rem; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); font-weight: 800;}
         .hero p { color: #c9d1d9; font-size: 1.2rem; max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
 
-        /* 4. Frosted Glass Buttons */
+        /* Frosted Glass Buttons */
         .btn-container { display: flex; gap: 20px; }
         .glass-btn {
             padding: 15px 35px;
@@ -84,24 +82,18 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
+        .glass-btn:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
         .glass-btn.primary { background: rgba(88, 166, 255, 0.3); border-color: rgba(88, 166, 255, 0.5);}
         .glass-btn.primary:hover { background: rgba(88, 166, 255, 0.5); }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
     <div class="nav-left">
-        <a href="/home.html" class="brand">🏛️ GovConnect</a>
+        <a href="/home.html" class="brand">🏛️ Grievance Tracker</a>
         <a href="/home.html" class="nav-link">Home</a>
 
-        <!-- HOVER DROPDOWN -->
         <div class="dropdown">
             <a href="#" class="nav-link" style="display:flex; align-items:center; gap:5px;">
                 Grievances <span style="font-size:10px;">▼</span>
@@ -119,7 +111,6 @@
     </div>
 </nav>
 
-<!-- HERO SECTION -->
 <div class="hero">
     <h1>Building a Better Community Together.</h1>
     <p>Your voice shapes our city. Report issues, track their resolution in real-time, and help us maintain a beautiful neighborhood for everyone.</p>

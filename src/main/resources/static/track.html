@@ -5,14 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Grievances</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0;}
-        .navbar { background: #0056b3; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        .navbar a { color: white; text-decoration: none; font-size: 20px; font-weight: bold; }
-        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        body, html { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f5; margin: 0; padding: 0; }
+        a { text-decoration: none; }
 
-        .container { max-width: 800px; margin: 30px auto; background: white; padding: 20px; border-radius: 12px; }
+        /* Sleek Dark Navbar */
+        .navbar { background-color: #0d1117; padding: 0 40px; height: 70px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: fixed; top: 0; width: 100%; box-sizing: border-box; z-index: 1000; }
+        .nav-left, .nav-right { display: flex; align-items: center; gap: 30px; }
+        .brand { color: #58a6ff; font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px;}
+        .nav-link { color: #c9d1d9; font-size: 15px; font-weight: 500; transition: color 0.2s; position: relative; padding: 25px 0;}
+        .nav-link:hover { color: #ffffff; }
+
+        .dropdown { position: relative; }
+        .dropdown-menu { position: absolute; top: 70px; left: 0; background: #161b22; border: 1px solid #30363d; border-radius: 8px; width: 220px; display: none; flex-direction: column; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
+        .dropdown:hover .dropdown-menu { display: flex; }
+        .dropdown-item { padding: 14px 20px; color: #c9d1d9; font-size: 14px; border-bottom: 1px solid #30363d; transition: background 0.2s;}
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: #21262d; color: #ffffff; }
+
+        .user-greet { color: #8b949e; font-size: 14px; }
+        .btn-logout { background: transparent; color: #f85149; border: 1px solid #f85149; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s;}
+        .btn-logout:hover { background: #f85149; color: #fff; }
+
+        /* Track Container (Pushed down to avoid navbar) */
+        .container { max-width: 800px; margin: 110px auto 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .card { border: 1px solid #ddd; padding: 20px; margin: 15px 0; border-radius: 8px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .dept-badge { font-size: 12px; background: #6c757d; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; margin-bottom: 10px; }
+        .dept-badge { font-size: 12px; background: #6c757d; color: white; padding: 4px 10px; border-radius: 12px; display: inline-block; margin-bottom: 10px; font-weight: bold;}
         .status { font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 13px; background: #ffc107; color: black; display: inline-block; }
         .date { font-size: 13px; color: #888; margin-bottom: 10px;}
         .del-btn { position: absolute; right: 20px; top: 20px; background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
@@ -20,23 +37,34 @@
     </style>
 </head>
 <body>
-<div class="navbar">
-    <a href="/home.html">🏢 Grievance Portal</a>
-    <div style="display:flex; align-items:center; gap:15px;">
-        <span id="navUser" style="color:white;"></span>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/home.html" class="brand">🏛️ Grievance Tracker</a>
+        <a href="/home.html" class="nav-link">Home</a>
+        <div class="dropdown">
+            <a href="#" class="nav-link" style="display:flex; align-items:center; gap:5px;">Grievances <span style="font-size:10px;">▼</span></a>
+            <div class="dropdown-menu">
+                <a href="/file.html" class="dropdown-item">✍️ File a Grievance</a>
+                <a href="/track.html" class="dropdown-item">🔍 Filed Grievances</a>
+            </div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <span class="user-greet" id="welcomeUser"></span>
         <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
-</div>
+</nav>
 
 <div class="container">
-    <h2>My Filed Grievances</h2>
+    <h2 style="margin-top:0;">My Filed Grievances</h2>
     <div id="list"></div>
 </div>
 
 <script>
     const user = localStorage.getItem("currentUser");
     if (!user) window.location.href = "/";
-    document.getElementById("navUser").innerText = "👤 " + user;
+    document.getElementById("welcomeUser").innerText = "Hi, " + user;
     function logout() { localStorage.clear(); window.location.href = "/"; }
 
     function load() {
