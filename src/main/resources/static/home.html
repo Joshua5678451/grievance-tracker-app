@@ -10,40 +10,16 @@
         a { text-decoration: none; }
 
         /* Sleek Dark Navbar */
-        .navbar {
-            background-color: #0d1117;
-            padding: 0 40px;
-            height: 70px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #30363d;
-            position: fixed;
-            top: 0; width: 100%; box-sizing: border-box; z-index: 1000;
-        }
+        .navbar { background-color: #0d1117; padding: 0 40px; height: 70px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; position: fixed; top: 0; width: 100%; box-sizing: border-box; z-index: 1000; }
         .nav-left, .nav-right { display: flex; align-items: center; gap: 30px; }
         .brand { color: #58a6ff; font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px;}
-
         .nav-link { color: #c9d1d9; font-size: 15px; font-weight: 500; transition: color 0.2s; position: relative; padding: 25px 0;}
         .nav-link:hover { color: #ffffff; }
 
         /* Hover Dropdown */
         .dropdown { position: relative; }
-        .dropdown-menu {
-            position: absolute;
-            top: 70px;
-            left: 0;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            width: 220px;
-            display: none;
-            flex-direction: column;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
+        .dropdown-menu { position: absolute; top: 70px; left: 0; background: #161b22; border: 1px solid #30363d; border-radius: 8px; width: 220px; display: none; flex-direction: column; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
         .dropdown:hover .dropdown-menu { display: flex; }
-
         .dropdown-item { padding: 14px 20px; color: #c9d1d9; font-size: 14px; border-bottom: 1px solid #30363d; transition: background 0.2s;}
         .dropdown-item:last-child { border-bottom: none; }
         .dropdown-item:hover { background: #21262d; color: #ffffff; }
@@ -54,37 +30,28 @@
         .btn-logout:hover { background: #f85149; color: #fff; }
 
         /* Hero Image Section */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-        }
+        .hero { height: 100vh; background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; }
         .hero h1 { color: #ffffff; font-size: 3.5rem; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); font-weight: 800;}
         .hero p { color: #c9d1d9; font-size: 1.2rem; max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
 
         /* Frosted Glass Buttons */
         .btn-container { display: flex; gap: 20px; }
-        .glass-btn {
-            padding: 15px 35px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+        .glass-btn { padding: 15px 35px; font-size: 16px; font-weight: bold; color: white; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .glass-btn:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
         .glass-btn.primary { background: rgba(88, 166, 255, 0.3); border-color: rgba(88, 166, 255, 0.5);}
         .glass-btn.primary:hover { background: rgba(88, 166, 255, 0.5); }
+
+        /* 📱 MOBILE RESPONSIVENESS (Desktop stays exactly the same!) */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 15px; }
+            .nav-left, .nav-right { gap: 10px; }
+            .brand { font-size: 15px; }
+            .nav-link { font-size: 13px; }
+            .user-greet { display: none; } /* Hides greeting to make room for Logout button */
+            .btn-logout { padding: 5px 12px; font-size: 12px; }
+            .hero h1 { font-size: 2.2rem; }
+            .btn-container { flex-direction: column; gap: 10px; width: 100%; }
+        }
     </style>
 </head>
 <body>
