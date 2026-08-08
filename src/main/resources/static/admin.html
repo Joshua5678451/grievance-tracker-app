@@ -5,26 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; padding: 20px; margin:0;}
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin:0;}
+        .navbar { background: #343a40; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .navbar a { color: white; text-decoration: none; font-size: 20px; font-weight: bold; }
+        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        .container { max-width: 1100px; margin: 30px auto; background: white; padding: 20px; border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: top; }
         th { background: #343a40; color: white; }
-        .del-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .del-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; width: 100%; font-weight:bold;}
+        .save-btn { background: #28a745; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; font-weight:bold;}
         .date { font-size: 12px; color: #666; }
+        .dept { font-size: 12px; background: #17a2b8; color: white; padding: 2px 6px; border-radius: 4px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;}
     </style>
 </head>
 <body>
+<div class="navbar">
+    <a>🛡️ Admin Authority Panel</a>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+</div>
+
 <div class="container">
-    <button onclick="logout()" style="background:#dc3545; color:white; border:none; padding:10px; border-radius:5px; float:right; cursor:pointer;">Logout</button>
-    <h2>Admin Authority Panel</h2>
+    <h2>Master Grievance List</h2>
 
     <table>
         <thead><tr>
-            <th>Date & User</th>
-            <th>Issue Details</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th width="15%">Citizen Info</th>
+            <th width="40%">Issue Details</th>
+            <th width="30%">Update Status & Add Note</th>
+            <th width="15%">Action</th>
         </tr></thead>
         <tbody id="tableBody"></tbody>
     </table>
@@ -32,6 +43,7 @@
 
 <script>
     if (localStorage.getItem("role") !== "ADMIN") window.location.href = "/";
+    function logout() { localStorage.clear(); window.location.href = "/"; }
 
     function load() {
         fetch('/api/grievances').then(r => r.json()).then(data => {
@@ -39,17 +51,28 @@
             tb.innerHTML = "";
             data.forEach(g => {
                 const dateStr = new Date(g.submissionDate).toLocaleString();
+                const currentNote = g.adminNote ? g.adminNote : "";
+
                 tb.innerHTML += `
                         <tr>
-                            <td><b>${g.citizenName}</b><br><span class="date">${dateStr}</span></td>
-                            <td><b>${g.title}</b><br>${g.description}</td>
                             <td>
-                                <select onchange="updateStatus(${g.id}, this.value)">
+                                <b>👤 ${g.citizenName}</b><br>
+                                <span class="date">${dateStr}</span>
+                            </td>
+                            <td>
+                                <span class="dept">${g.department}</span><br>
+                                <b style="font-size:16px;">${g.title}</b><br>
+                                <p style="margin: 5px 0;">${g.description}</p>
+                            </td>
+                            <td>
+                                <select id="status-${g.id}">
                                     <option value="${g.status}" hidden>${g.status}</option>
                                     <option value="OPEN">OPEN</option>
                                     <option value="SOLVING">SOLVING</option>
                                     <option value="SOLVED">SOLVED</option>
                                 </select>
+                                <input type="text" id="note-${g.id}" placeholder="Type a reply note to citizen..." value="${currentNote}">
+                                <button class="save-btn" onclick="updateRecord(${g.id})">Save Update</button>
                             </td>
                             <td><button class="del-btn" onclick="deleteG(${g.id})">Delete</button></td>
                         </tr>`;
@@ -57,9 +80,22 @@
         });
     }
 
-    function updateStatus(id, stat) { fetch(`/api/grievances/${id}/status?status=${stat}`, { method: 'PUT' }).then(() => load()); }
-    function deleteG(id) { if(confirm("Delete this record?")) fetch(`/api/grievances/${id}`, { method: 'DELETE' }).then(() => load()); }
-    function logout() { localStorage.clear(); window.location.href = "/"; }
+    function updateRecord(id) {
+        const newStatus = document.getElementById(`status-${id}`).value;
+        const newNote = document.getElementById(`note-${id}`).value;
+
+        fetch(`/api/grievances/${id}/status?status=${encodeURIComponent(newStatus)}&adminNote=${encodeURIComponent(newNote)}`, { method: 'PUT' })
+            .then(() => {
+                alert("Update sent to citizen!");
+                load();
+            });
+    }
+
+    function deleteG(id) {
+        if(confirm("Delete this record permanently?")) {
+            fetch(`/api/grievances/${id}`, { method: 'DELETE' }).then(() => load());
+        }
+    }
 
     load();
 </script>

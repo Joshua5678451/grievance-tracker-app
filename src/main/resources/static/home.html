@@ -5,25 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Hub</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f5; margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; }
+        .navbar { background: #0056b3; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .navbar h3 { margin: 0; font-size: 20px; }
+        .navbar-right { display: flex; align-items: center; gap: 15px; }
+        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
         .btn-big { display: block; width: 100%; padding: 20px; margin: 15px 0; background: #007bff; color: white; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold; box-sizing: border-box; }
         .btn-alt { background: #17a2b8; }
-        .btn-logout { background: #dc3545; padding: 10px; border: none; color: white; border-radius: 6px; cursor: pointer; float: right; }
     </style>
 </head>
 <body>
+<div class="navbar">
+    <h3>🏢 Grievance Portal</h3>
+    <div class="navbar-right">
+        <span id="navUser"></span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+</div>
+
 <div class="container">
-    <button class="btn-logout" onclick="logout()">Logout</button>
     <h1 id="welcomeMsg">Welcome</h1>
     <p style="color: #666; margin-bottom: 30px;">What would you like to do today?</p>
 
     <a href="/file.html" class="btn-big">✍️ File a New Grievance</a>
     <a href="/track.html" class="btn-big btn-alt">🔍 View My Filed Grievances</a>
 </div>
+
 <script>
     const user = localStorage.getItem("currentUser");
     if (!user || localStorage.getItem("role") === "ADMIN") window.location.href = "/";
+    document.getElementById("navUser").innerText = "👤 " + user;
     document.getElementById("welcomeMsg").innerText = "Welcome, " + user + "!";
     function logout() { localStorage.clear(); window.location.href = "/"; }
 </script>

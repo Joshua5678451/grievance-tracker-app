@@ -19,18 +19,19 @@ public class GrievanceService {
         return repository.findAll();
     }
 
-    // New trick: Get only the grievances for one user
     public List<Grievance> getGrievancesByUser(String name) {
         return repository.findByCitizenName(name);
     }
 
-    public Grievance updateStatus(Long id, String newStatus) {
+    // Upgraded trick: Save the status AND the admin's note
+    public Grievance updateStatus(Long id, String newStatus, String adminNote) {
         Grievance grievance = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Grievance not found"));
         grievance.setStatus(newStatus);
+        grievance.setAdminNote(adminNote);
         return repository.save(grievance);
     }
-    // New trick: Delete a grievance
+
     public void deleteGrievance(Long id) {
         repository.deleteById(id);
     }

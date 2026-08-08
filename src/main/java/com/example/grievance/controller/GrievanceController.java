@@ -22,17 +22,17 @@ public class GrievanceController {
         return service.getAllGrievances();
     }
 
-    // New web link to fetch a user's specific history
     @GetMapping("/user/{name}")
     public List<Grievance> getUserGrievances(@PathVariable String name) {
         return service.getGrievancesByUser(name);
     }
 
+    // Upgraded web link to catch the admin note
     @PutMapping("/{id}/status")
-    public Grievance updateStatus(@PathVariable Long id, @RequestParam String status) {
-        return service.updateStatus(id, status);
+    public Grievance updateStatus(@PathVariable Long id, @RequestParam String status, @RequestParam(required = false) String adminNote) {
+        return service.updateStatus(id, status, adminNote);
     }
-    // New web link to delete a record
+
     @DeleteMapping("/{id}")
     public void deleteGrievance(@PathVariable Long id) {
         service.deleteGrievance(id);

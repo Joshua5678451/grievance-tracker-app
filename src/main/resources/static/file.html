@@ -5,17 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File a Grievance</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
-        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; }
+        .navbar { background: #0056b3; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .navbar a { color: white; text-decoration: none; font-size: 20px; font-weight: bold; }
+        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .container { max-width: 500px; margin: 40px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        input, textarea, select, button { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
+        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
+<div class="navbar">
+    <a href="/home.html">🏢 Grievance Portal</a>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <span id="navUser" style="color:white;"></span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+</div>
+
 <div class="container">
-    <a href="/home.html" class="back-link">← Back to Home</a>
     <h2>Report an Issue</h2>
+
+    <select id="department">
+        <option value="" disabled selected>-- Select a Department --</option>
+        <option value="Public Works & Roads">Public Works & Roads (Potholes, Traffic Lights)</option>
+        <option value="Water & Sanitation">Water & Sanitation (Leaks, Sewage)</option>
+        <option value="Electricity & Power">Electricity & Power (Outages, Wires)</option>
+        <option value="Waste Management">Waste Management (Garbage, Bins)</option>
+        <option value="Public Health & Safety">Public Health & Safety (Hazards, Noise)</option>
+        <option value="Other / General">Other / General</option>
+    </select>
+
     <input type="text" id="title" placeholder="Short Title (e.g., Broken Pipe)">
     <textarea id="description" placeholder="Provide details here..." rows="5"></textarea>
     <button onclick="submitGrievance()">Submit to Authorities</button>
@@ -23,18 +43,22 @@
 <script>
     const user = localStorage.getItem("currentUser");
     if (!user) window.location.href = "/";
+    document.getElementById("navUser").innerText = "👤 " + user;
+    function logout() { localStorage.clear(); window.location.href = "/"; }
 
     function submitGrievance() {
-        const t = document.getElementById("title").value;
-        const d = document.getElementById("description").value;
-        if(!t || !d) return alert("Please fill everything!");
+        const dept = document.getElementById("department").value;
+        const t = document.getElementById("title").value.trim();
+        const d = document.getElementById("description").value.trim();
+
+        if(!dept || !t || !d) return alert("Please fill everything, including the department!");
 
         fetch('/api/grievances', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ citizenName: user, title: t, description: d })
+            body: JSON.stringify({ citizenName: user, department: dept, title: t, description: d })
         }).then(() => {
             alert("Grievance Successfully Filed!");
-            window.location.href = "/track.html"; // Send them to see it!
+            window.location.href = "/track.html";
         });
     }
 </script>

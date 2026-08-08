@@ -5,41 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Grievances</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; padding: 20px; margin: 0;}
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; }
-        .back-link { color: #007bff; text-decoration: none; font-weight: bold; margin-bottom: 15px; display: inline-block;}
-        .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; position: relative;}
-        .status { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px; background: #ffc107; color: black; display: inline-block; margin-top: 5px;}
-        .date { font-size: 12px; color: #888; }
-        .del-btn { position: absolute; right: 15px; top: 15px; background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0;}
+        .navbar { background: #0056b3; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .navbar a { color: white; text-decoration: none; font-size: 20px; font-weight: bold; }
+        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        .container { max-width: 800px; margin: 30px auto; background: white; padding: 20px; border-radius: 12px; }
+        .card { border: 1px solid #ddd; padding: 20px; margin: 15px 0; border-radius: 8px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .dept-badge { font-size: 12px; background: #6c757d; color: white; padding: 3px 8px; border-radius: 12px; display: inline-block; margin-bottom: 10px; }
+        .status { font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 13px; background: #ffc107; color: black; display: inline-block; }
+        .date { font-size: 13px; color: #888; margin-bottom: 10px;}
+        .del-btn { position: absolute; right: 20px; top: 20px; background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .admin-note { background: #e9ecef; padding: 12px; margin-top: 15px; border-left: 4px solid #28a745; border-radius: 4px; font-size: 14px; }
     </style>
 </head>
 <body>
+<div class="navbar">
+    <a href="/home.html">🏢 Grievance Portal</a>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <span id="navUser" style="color:white;"></span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+</div>
+
 <div class="container">
-    <a href="/home.html" class="back-link">← Back to Home</a>
     <h2>My Filed Grievances</h2>
     <div id="list"></div>
 </div>
+
 <script>
     const user = localStorage.getItem("currentUser");
     if (!user) window.location.href = "/";
+    document.getElementById("navUser").innerText = "👤 " + user;
+    function logout() { localStorage.clear(); window.location.href = "/"; }
 
     function load() {
         fetch(`/api/grievances/user/${user}`).then(res => res.json()).then(data => {
             const list = document.getElementById("list");
             list.innerHTML = "";
-            if(data.length === 0) list.innerHTML = "<p>No grievances filed yet.</p>";
+            if(data.length === 0) list.innerHTML = "<p style='text-align:center; color:#666;'>You haven't filed any grievances yet.</p>";
 
             data.forEach(g => {
-                // Format the date beautifully
                 const dateStr = new Date(g.submissionDate).toLocaleString();
+                const noteHtml = g.adminNote ? `<div class="admin-note"><strong>Admin Reply:</strong> ${g.adminNote}</div>` : '';
+
                 list.innerHTML += `
                         <div class="card">
                             <button class="del-btn" onclick="deleteG(${g.id})">Delete</button>
+                            <div class="dept-badge">🏛️ ${g.department}</div>
                             <h3 style="margin:0 0 5px 0;">${g.title}</h3>
                             <div class="date">📅 ${dateStr}</div>
                             <p style="margin:10px 0;">${g.description}</p>
                             <div class="status">STATUS: ${g.status}</div>
+                            ${noteHtml}
                         </div>
                     `;
             });
