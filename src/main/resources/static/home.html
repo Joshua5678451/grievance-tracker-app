@@ -3,40 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citizen Hub</title>
+    <title>Citizen Hub - Grievance Portal</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; }
-        .navbar { background: #0056b3; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .navbar h3 { margin: 0; font-size: 20px; }
-        .navbar-right { display: flex; align-items: center; gap: 15px; }
-        .btn-logout { background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-        .btn-big { display: block; width: 100%; padding: 20px; margin: 15px 0; background: #007bff; color: white; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold; box-sizing: border-box; }
-        .btn-alt { background: #17a2b8; }
+        /* Reset & Base */
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100%; }
+        a { text-decoration: none; }
+
+        /* 1. Sleek Dark Navbar (Neon Style) */
+        .navbar {
+            background-color: #0d1117;
+            padding: 0 40px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+            position: fixed;
+            top: 0; width: 100%; box-sizing: border-box; z-index: 1000;
+        }
+        .nav-left, .nav-right { display: flex; align-items: center; gap: 30px; }
+        .brand { color: #58a6ff; font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px;}
+
+        .nav-link { color: #c9d1d9; font-size: 15px; font-weight: 500; transition: color 0.2s; position: relative; padding: 25px 0;}
+        .nav-link:hover { color: #ffffff; }
+
+        /* 2. Hover Dropdown Magic */
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 70px; /* Right below the navbar */
+            left: 0;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            width: 220px;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        /* When hovering over the .dropdown container, display the menu! */
+        .dropdown:hover .dropdown-menu { display: flex; }
+
+        .dropdown-item { padding: 14px 20px; color: #c9d1d9; font-size: 14px; border-bottom: 1px solid #30363d; transition: background 0.2s;}
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: #21262d; color: #ffffff; }
+
+        /* User & Logout */
+        .user-greet { color: #8b949e; font-size: 14px; }
+        .btn-logout { background: transparent; color: #f85149; border: 1px solid #f85149; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s;}
+        .btn-logout:hover { background: #f85149; color: #fff; }
+
+        /* 3. Hero Image Section */
+        .hero {
+            height: 100vh;
+            /* High-quality city image from Unsplash with a dark overlay */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .hero h1 { color: #ffffff; font-size: 3.5rem; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); font-weight: 800;}
+        .hero p { color: #c9d1d9; font-size: 1.2rem; max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
+
+        /* 4. Frosted Glass Buttons */
+        .btn-container { display: flex; gap: 20px; }
+        .glass-btn {
+            padding: 15px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .glass-btn.primary { background: rgba(88, 166, 255, 0.3); border-color: rgba(88, 166, 255, 0.5);}
+        .glass-btn.primary:hover { background: rgba(88, 166, 255, 0.5); }
     </style>
 </head>
 <body>
-<div class="navbar">
-    <h3>🏢 Grievance Portal</h3>
-    <div class="navbar-right">
-        <span id="navUser"></span>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/home.html" class="brand">🏛️ GovConnect</a>
+        <a href="/home.html" class="nav-link">Home</a>
+
+        <!-- HOVER DROPDOWN -->
+        <div class="dropdown">
+            <a href="#" class="nav-link" style="display:flex; align-items:center; gap:5px;">
+                Grievances <span style="font-size:10px;">▼</span>
+            </a>
+            <div class="dropdown-menu">
+                <a href="/file.html" class="dropdown-item">✍️ File a Grievance</a>
+                <a href="/track.html" class="dropdown-item">🔍 Filed Grievances</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <span class="user-greet" id="welcomeUser"></span>
         <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
-</div>
+</nav>
 
-<div class="container">
-    <h1 id="welcomeMsg">Welcome</h1>
-    <p style="color: #666; margin-bottom: 30px;">What would you like to do today?</p>
+<!-- HERO SECTION -->
+<div class="hero">
+    <h1>Building a Better Community Together.</h1>
+    <p>Your voice shapes our city. Report issues, track their resolution in real-time, and help us maintain a beautiful neighborhood for everyone.</p>
 
-    <a href="/file.html" class="btn-big">✍️ File a New Grievance</a>
-    <a href="/track.html" class="btn-big btn-alt">🔍 View My Filed Grievances</a>
+    <div class="btn-container">
+        <a href="/file.html" class="glass-btn primary">Report an Issue</a>
+        <a href="/track.html" class="glass-btn">Track Progress</a>
+    </div>
 </div>
 
 <script>
     const user = localStorage.getItem("currentUser");
     if (!user || localStorage.getItem("role") === "ADMIN") window.location.href = "/";
-    document.getElementById("navUser").innerText = "👤 " + user;
-    document.getElementById("welcomeMsg").innerText = "Welcome, " + user + "!";
+    document.getElementById("welcomeUser").innerText = "Hi, " + user;
     function logout() { localStorage.clear(); window.location.href = "/"; }
 </script>
 </body>
